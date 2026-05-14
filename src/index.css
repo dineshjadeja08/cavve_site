@@ -169,8 +169,8 @@ img { display: block; max-width: 100%; height: auto; }
   width: 100%;
   height: 100%;
   z-index: -1;
-  background: url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=2400&q=90") center / cover;
-  filter: saturate(0.2) contrast(1.1);
+  background-position: center;
+  background-size: cover;
 }
 
 .hero-image::after {
@@ -612,23 +612,76 @@ img { display: block; max-width: 100%; height: auto; }
   color: var(--secondary);
 }
 
-/* Responsive */
+/* Responsive Overrides */
 @media (max-width: 1024px) {
   .desktop-nav { display: none; }
+  .mobile-only { display: flex !important; }
+  
   .section-grid { grid-template-columns: 1fr; }
-  .product-grid { grid-template-columns: 1fr 1fr; }
-  .pdp { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .pdp { grid-template-columns: 1fr; gap: 60px; }
   .footer-main { grid-template-columns: 1fr; gap: 60px; }
   .editorial-band { grid-template-columns: 1fr; }
   .editorial-photo { min-height: 400px; order: -1; }
+  
+  .cart-layout { grid-template-columns: 1fr !important; gap: 40px !important; }
 }
 
-@media (max-width: 640px) {
-  .product-grid { grid-template-columns: 1fr; }
-  .hero-title { font-size: 80px; }
-  .hero-actions { flex-direction: column; }
-  .primary-button, .secondary-button { width: 100%; }
+@media (max-width: 768px) {
+  :root {
+    --section-padding: 60px 20px;
+  }
+
+  .site-header {
+    padding: 16px 20px;
+  }
+
+  .hero-section {
+    padding: 100px 20px 60px;
+  }
+
+  .hero-title {
+    font-size: clamp(48px, 18vw, 120px);
+    line-height: 0.95;
+    margin-bottom: 24px;
+  }
+
+  .section-padding {
+    padding: 80px 20px;
+  }
+  
+  .journal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    padding: 60px 20px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
 }
+
+@media (max-width: 480px) {
+  .product-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; gap: 12px; }
+  .primary-button, .secondary-button { width: 100%; justify-content: center; }
+  
+  .purchase-panel {
+    padding: 0;
+  }
+
+  .gallery {
+    gap: 10px;
+  }
+}
+
+/* Utilities */
+.mobile-only { display: none; }
+@media (max-width: 1024px) { .desktop-only { display: none !important; } }
 
 /* Animations */
 .fade-up {

@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
+import heroImage from './assets/hero.png'
 import {
   ArrowRight,
   Heart,
@@ -269,18 +270,29 @@ function HomePage() {
       { y: '100%' }, 
       { y: 0, stagger: 0.15, duration: 1.2, ease: 'power4.out', delay: 0.2 }
     );
+    tl.fromTo('.hero-image',
+      { opacity: 0, scale: 1.1 },
+      { opacity: 1, scale: 1, duration: 2, ease: 'power2.out' },
+      0
+    );
     tl.fromTo('.hero-fade-in',
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
-      '-=0.8'
+      '-=1.5'
     );
   }, [])
 
   return (
     <motion.div {...pageTransition}>
       <section className="hero-section">
-        <div className="hero-image" />
-        <div className="hero-content">
+        <div 
+          className="hero-image" 
+          style={{ 
+            backgroundImage: `url(${heroImage})`,
+            zIndex: 0
+          }} 
+        />
+        <div className="hero-content" style={{ position: 'relative', zIndex: 10 }}>
           <div className="hero-fade-in">
             <span className="eyebrow">Launch 001 / 240 GSM Cotton</span>
           </div>
