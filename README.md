@@ -18,7 +18,7 @@ cp .env.example .env
 npm run dev:all
 ```
 
-Frontend: `http://localhost:5173`  
+Frontend: `http://localhost:5174`  
 Backend health: `http://localhost:8787/api/health`
 
 ## Supabase

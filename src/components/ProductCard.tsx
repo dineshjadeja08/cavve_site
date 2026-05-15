@@ -1,4 +1,4 @@
-import { Heart, Plus } from 'lucide-react'
+import { Heart, Plus, ShoppingBag } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Product } from '../data/catalog'
 import { formatInr } from '../lib/utils'
@@ -31,21 +31,23 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
       <div className="product-meta">
-        <div>
+        <div style={{ flex: 1 }}>
           <Link to={`/products/${product.slug}`} className="product-name">{product.name}</Link>
-          <p className="product-specs">{product.gsm} • {product.fit}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <span className="product-specs">{product.gsm} • {product.fit}</span>
+            <div className="color-swatch" style={{ background: product.colorHex, width: '10px', height: '10px', borderRadius: '50%', border: '1px solid var(--border)' }} />
+          </div>
         </div>
-        <div className="product-actions">
+        <div className="product-price-wrapper">
           <span className="product-price">{formatInr(product.price)}</span>
         </div>
       </div>
       <button 
-        className="primary-button wide" 
+        className="quick-add-btn" 
         onClick={() => addToCart(product)} 
         aria-label={`Quick add ${product.name}`}
-        style={{ marginTop: '20px', padding: '12px', fontSize: '10px' }}
       >
-        <Plus size={14} />
+        <ShoppingBag size={14} />
         Quick add
       </button>
     </article>

@@ -11,6 +11,9 @@ export type CartItem = {
 type CommerceState = {
   cart: CartItem[]
   wishlist: string[]
+  isCartOpen: boolean
+  openCart: () => void
+  closeCart: () => void
   addToCart: (product: Product, size?: string) => void
   updateQuantity: (id: string, size: string, quantity: number) => void
   removeFromCart: (id: string, size: string) => void
@@ -23,19 +26,21 @@ export const useCommerceStore = create<CommerceState>()(
     (set) => ({
       cart: [],
       wishlist: [],
+      isCartOpen: false,
+      openCart: () => set({ isCartOpen: true }),
+      closeCart: () => set({ isCartOpen: false }),
       addToCart: (product, size = 'M') =>
         set((state) => {
           const existing = state.cart.find((item) => item.product.id === product.id && item.size === size)
-          if (existing) {
-            return {
-              cart: state.cart.map((item) =>
+          const newCart = existing
+            ? state.cart.map((item) =>
                 item.product.id === product.id && item.size === size
                   ? { ...item, quantity: item.quantity + 1 }
                   : item,
-              ),
-            }
-          }
-          return { cart: [...state.cart, { product, size, quantity: 1 }] }
+              )
+            : [...state.cart, { product, size, quantity: 1 }]
+          
+          return { cart: newCart, isCartOpen: true }
         }),
       updateQuantity: (id, size, quantity) =>
         set((state) => ({
