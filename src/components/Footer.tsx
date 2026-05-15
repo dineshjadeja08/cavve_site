@@ -1,76 +1,75 @@
 import { Link } from 'react-router-dom'
-
+import { ArrowRight, Mail } from 'lucide-react'
 
 export function Footer() {
   return (
-    <footer className="footer">
-      <div className="footer-main">
-        <div className="footer-brand">
-          <Link to="/" className="footer-logo">CAVVE</Link>
-          <p className="footer-tagline">WEAR DISCIPLINE</p>
-          <p className="footer-desc">
-            Premium minimalist menswear engineered for the ambitious. 
-            Quiet luxury silouhettes in heavyweight cotton.
-          </p>
-          <div className="social-links">
-            <a href="#" aria-label="Instagram">Instagram</a>
-            <a href="#" aria-label="Twitter">Twitter</a>
-            <a href="#" aria-label="LinkedIn">LinkedIn</a>
-          </div>
-        </div>
-        
-        <div className="footer-links-group">
-          <div className="link-column">
-            <p className="eyebrow">Shop</p>
-            <nav>
-              <Link to="/collections">All Products</Link>
-              <Link to="/collections?category=tees">Oversized Tees</Link>
-              <Link to="/drop">Drop 001</Link>
-              <Link to="/wishlist">Wishlist</Link>
-            </nav>
+    <footer className="footer" style={{ borderTop: '1px solid var(--border)', background: 'var(--surface)' }}>
+      <div className="section-padding">
+        <div className="footer-main" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '80px', marginBottom: '80px' }}>
+          
+          <div className="footer-brand">
+            <Link to="/" className="logo" style={{ fontSize: '32px', marginBottom: '16px', display: 'block' }}>CAVVE</Link>
+            <p className="eyebrow" style={{ marginBottom: '32px' }}>Wear Discipline</p>
+            <p style={{ color: 'var(--secondary)', fontSize: '14px', lineHeight: 1.8, maxWidth: '300px' }}>
+              Engineered uniforms for the disciplined. Quiet luxury silhouettes crafted with surgical precision.
+            </p>
           </div>
 
-          <div className="link-column">
+          <div className="footer-links">
+            <p className="eyebrow">Catalog</p>
+            <ul style={{ display: 'grid', gap: '12px' }}>
+              <li><Link to="/collections" style={{ fontSize: '13px' }}>All Repetitions</Link></li>
+              <li><Link to="/drop" style={{ fontSize: '13px' }}>Drop 001</Link></li>
+              <li><Link to="/collections" style={{ fontSize: '13px' }}>The Core Tee</Link></li>
+              <li><Link to="/journal" style={{ fontSize: '13px' }}>Field Notes</Link></li>
+            </ul>
+          </div>
+
+          <div className="footer-links">
             <p className="eyebrow">Manifesto</p>
-            <nav>
-              <Link to="/about">Our Story</Link>
-              <Link to="/journal">Journal</Link>
-              <Link to="/about#fabric">The Fabric</Link>
-              <Link to="/about#discipline">The Discipline</Link>
-            </nav>
+            <ul style={{ display: 'grid', gap: '12px' }}>
+              <li><Link to="/about" style={{ fontSize: '13px' }}>Our Protocol</Link></li>
+              <li><Link to="/about" style={{ fontSize: '13px' }}>Fabric Engineering</Link></li>
+              <li><Link to="/about" style={{ fontSize: '13px' }}>The Discipline</Link></li>
+              <li><Link to="/journal" style={{ fontSize: '13px' }}>Editorial</Link></li>
+            </ul>
           </div>
 
-          <div className="link-column">
-            <p className="eyebrow">Support</p>
-            <nav>
-              <Link to="/order-tracking">Track Order</Link>
-              <Link to="/account">Returns & Exchanges</Link>
-              <Link to="/about#shipping">Shipping Policy</Link>
-              <Link to="/contact">Contact Support</Link>
-            </nav>
+          <div className="footer-newsletter">
+            <p className="eyebrow">The System</p>
+            <p style={{ fontSize: '13px', color: 'var(--secondary)', marginBottom: '24px' }}>
+              Join the internal protocol for early access and editorial insights.
+            </p>
+            <form onSubmit={(e) => e.preventDefault()} style={{ position: 'relative' }}>
+              <input 
+                type="email" 
+                placeholder="email@example.com" 
+                style={{ 
+                  width: '100%', 
+                  padding: '16px 0', 
+                  background: 'transparent', 
+                  border: 'none', 
+                  borderBottom: '1px solid var(--border)', 
+                  fontSize: '13px' 
+                }} 
+              />
+              <button type="submit" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>
+                <ArrowRight size={18} />
+              </button>
+            </form>
           </div>
         </div>
 
-        <div className="footer-newsletter">
-          <p className="eyebrow">Join the System</p>
-          <p className="newsletter-text">Subscribe for early access to Drop 002 and editorial field notes.</p>
-          <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="email@example.com" aria-label="Email address for newsletter" />
-            <button type="submit" aria-label="Subscribe">Join</button>
-          </form>
-          <p className="privacy-note">By subscribing, you agree to our Privacy Policy.</p>
-        </div>
-      </div>
-
-      <div className="footer-bottom">
-        <div className="footer-legal">
-          <span>© 2024 CAVVE India</span>
-          <Link to="/privacy">Privacy Policy</Link>
-          <Link to="/terms">Terms of Service</Link>
-        </div>
-        <div className="payment-methods">
-          {/* Mock payment icons */}
-          <span style={{ opacity: 0.5 }}>RAZORPAY SECURE</span>
+        <div className="footer-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '40px', borderTop: '1px solid var(--border)' }}>
+          <div className="legal-links" style={{ display: 'flex', gap: '32px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--secondary)' }}>
+            <span>© 2024 CAVVE India</span>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
+          
+          <div className="social-links" style={{ display: 'flex', gap: '24px', color: 'var(--primary)' }}>
+            <a href="#" aria-label="Social Link"><Mail size={18} strokeWidth={1.5} /></a>
+          </div>
         </div>
       </div>
     </footer>

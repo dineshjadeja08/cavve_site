@@ -10,6 +10,7 @@ import {
 import { AuthProvider } from './context/AuthContext'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
+import { MobileNav } from './components/MobileNav'
 import { HomePage } from './pages/HomePage'
 import { CollectionsPage } from './pages/CollectionsPage'
 import { ProductPage } from './pages/ProductPage'
@@ -46,6 +47,7 @@ function Layout() {
         </AnimatePresence>
       </main>
       <Footer />
+      <MobileNav />
     </div>
   )
 }

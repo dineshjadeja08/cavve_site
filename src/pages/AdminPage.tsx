@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { 
   LayoutDashboard, 
   Package, 
   Users, 
-  Settings, 
   TrendingUp, 
-  ArrowUpRight, 
   Clock,
-  ExternalLink,
   ChevronRight,
   Plus,
   Trash2,
   Layers,
-  Search,
-  Filter,
-  MoreVertical,
   CheckCircle2
 } from 'lucide-react'
 import { useAuthState } from '../context/AuthContext'

@@ -4,53 +4,66 @@ import type { Product } from '../data/catalog'
 import { formatInr } from '../lib/utils'
 import { useCommerceStore } from '../store/cart'
 
-export function ProductCard({ product }: { product: Product }) {
-  const { addToCart, toggleWishlist, wishlist } = useCommerceStore()
-  const saved = wishlist.includes(product.id)
-
-  return (
-    <article className="product-card fade-up">
-      <Link 
-        to={`/products/${product.slug}`} 
-        className="product-media" 
-        aria-label={product.name}
-      >
-        <img src={product.gallery[0]} alt={product.name} loading="lazy" />
-        <img src={product.gallery[1]} alt="" aria-hidden="true" loading="lazy" style={{ position: 'absolute', inset: 0, opacity: 0 }} className="hover-img" />
-        <div className="product-overlay">
-          <button 
-            className="icon-button" 
-            onClick={(e) => {
-              e.preventDefault()
-              toggleWishlist(product.id)
-            }} 
-            aria-label="Save to wishlist"
-          >
-            <Heart size={18} fill={saved ? 'var(--accent)' : 'none'} stroke={saved ? 'var(--accent)' : 'currentColor'} />
-          </button>
-        </div>
-      </Link>
-      <div className="product-meta">
-        <div style={{ flex: 1 }}>
-          <Link to={`/products/${product.slug}`} className="product-name">{product.name}</Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-            <span className="product-specs">{product.gsm} • {product.fit}</span>
-            <div className="color-swatch" style={{ background: product.colorHex, width: '10px', height: '10px', borderRadius: '50%', border: '1px solid var(--border)' }} />
-          </div>
-        </div>
-        <div className="product-price-wrapper">
-          <span className="product-price">{formatInr(product.price)}</span>
-        </div>
-      </div>
-      <button 
-        className="quick-add-btn" 
-        onClick={() => addToCart(product)} 
-        aria-label={`Quick add ${product.name}`}
-      >
-        <ShoppingBag size={14} />
-        Quick add
-      </button>
-    </article>
-  )
+interface ProductCardProps {
+  product: Product
 }
 
+export function ProductCard({ product }: ProductCardProps) {
+  const { wishlist, toggleWishlist } = useCommerceStore()
+  const isWishlisted = wishlist.includes(product.id)
+
+  return (
+    <div className="product-card group">
+      <Link to={`/products/${product.slug}`} className="product-image-wrapper">
+        <img 
+          src={product.gallery[0]} 
+          alt={product.name}
+          loading="lazy"
+        />
+        
+        <div className="quick-add-overlay">
+          <button className="primary-button wide" style={{ padding: '12px', fontSize: '10px' }}>
+            Quick View <ShoppingBag size={14} />
+          </button>
+        </div>
+        
+        <button 
+          className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
+          onClick={(e) => {
+            e.preventDefault()
+            toggleWishlist(product.id)
+          }}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'white',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: isWishlisted ? 'var(--error)' : 'var(--primary)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            zIndex: 10
+          }}
+        >
+          <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} strokeWidth={1.5} />
+        </button>
+      </Link>
+
+      <div className="product-meta">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <h3 className="product-name">
+            <Link to={`/products/${product.slug}`}>{product.name}</Link>
+          </h3>
+          <span className="product-price">{formatInr(product.price)}</span>
+        </div>
+        <p style={{ fontSize: '12px', color: 'var(--secondary)', marginTop: '4px' }}>
+          {product.gsm} • {product.fit}
+        </p>
+      </div>
+    </div>
+  )
+}
