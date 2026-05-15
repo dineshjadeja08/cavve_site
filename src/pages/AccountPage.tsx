@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { LogOut, Package, User, MapPin, ChevronRight } from 'lucide-react'
+import { LogOut, Package, User, MapPin, ChevronRight, ShoppingBag } from 'lucide-react'
 import { useAuthState } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { SignInForm } from '../components/SignInForm'
@@ -10,8 +11,30 @@ import { formatInr } from '../lib/utils'
 export function AccountPage() {
   const { session, profile, loading } = useAuthState()
   const [activeTab, setActiveTab] = useState('orders')
+  const [orders, setOrders] = useState<any[]>([])
+  const [isFetching, setIsFetching] = useState(false)
 
-  if (loading) return <div className="section-padding page-header-offset">Verifying credentials...</div>
+  useEffect(() => {
+    if (!session || !supabase) return
+
+    async function fetchOrders() {
+      setIsFetching(true)
+      const { data, error } = await supabase!
+        .from('orders')
+        .select('*')
+        .eq('user_id', session!.user.id)
+        .order('created_at', { ascending: false })
+      
+      if (!error && data) {
+        setOrders(data)
+      }
+      setIsFetching(false)
+    }
+
+    fetchOrders()
+  }, [session])
+
+  if (loading) return <div className="section-padding page-header-offset" style={{ textAlign: 'center' }}>Verifying credentials...</div>
 
   if (!session) {
     return (
@@ -82,34 +105,56 @@ export function AccountPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '60px' }}>
                 <h2 style={{ fontSize: '40px' }}>Recent Repetitions</h2>
-                <span className="eyebrow" style={{ marginBottom: 0 }}>Showing last 5 orders</span>
+                <span className="eyebrow" style={{ marginBottom: 0 }}>Showing {orders.length} protocol assignments</span>
               </div>
 
-              {/* Mock orders if none exist */}
-              <div style={{ display: 'grid', gap: '24px' }}>
-                <div style={{ padding: '32px', border: '1px solid var(--border)', background: 'white' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-                    <div>
-                      <p className="eyebrow" style={{ marginBottom: '4px' }}>Order #CAV-8271</p>
-                      <p style={{ fontSize: '13px', color: 'var(--secondary)' }}>May 12, 2024</p>
-                    </div>
-                    <span className="status-pill paid">Paid / Processing</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                    <div style={{ width: '80px', height: '100px', background: 'var(--surface)', overflow: 'hidden' }}>
-                      <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=200&q=80" alt="Product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div>
-                      <p style={{ fontWeight: 700, fontSize: '14px' }}>Jet Black Oversized Tee (L)</p>
-                      <p style={{ fontSize: '14px', color: 'var(--secondary)' }}>{formatInr(2490)} x 1</p>
-                    </div>
-                  </div>
-                  <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700 }}>Total: {formatInr(2490)}</span>
-                    <button className="text-link">View Details <ChevronRight size={14} /></button>
-                  </div>
+              {isFetching ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>Syncing order data...</div>
+              ) : orders.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '100px 0', border: '1px solid var(--border)', background: 'white' }}>
+                  <ShoppingBag size={48} style={{ opacity: 0.1, marginBottom: '24px' }} />
+                  <p style={{ color: 'var(--secondary)' }}>No protocol assignments found in your history.</p>
+                  <Link to="/collections" className="text-link" style={{ marginTop: '24px' }}>Build your uniform <ChevronRight size={14} /></Link>
                 </div>
-              </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '24px' }}>
+                  {orders.map(order => (
+                    <div key={order.id} style={{ padding: '32px', border: '1px solid var(--border)', background: 'white' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+                        <div>
+                          <p className="eyebrow" style={{ marginBottom: '4px' }}>Order #{order.id.slice(0, 8).toUpperCase()}</p>
+                          <p style={{ fontSize: '13px', color: 'var(--secondary)' }}>
+                            {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </p>
+                        </div>
+                        <span className={`status-pill ${order.status}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                      
+                      {/* Items loop - assuming order.items is an array of objects */}
+                      <div style={{ display: 'grid', gap: '16px' }}>
+                        {order.items?.map((item: any, idx: number) => (
+                          <div key={idx} style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                            <div style={{ width: '60px', height: '80px', background: 'var(--surface)', overflow: 'hidden' }}>
+                              <img src={item.product?.gallery?.[0]} alt={item.product?.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                            <div>
+                              <p style={{ fontWeight: 700, fontSize: '14px' }}>{item.product?.name} ({item.size})</p>
+                              <p style={{ fontSize: '14px', color: 'var(--secondary)' }}>{formatInr(item.product?.price)} x {item.quantity}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 700 }}>Total: {formatInr(order.total_inr)}</span>
+                        <button className="text-link">View Protocol Details <ChevronRight size={14} /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
