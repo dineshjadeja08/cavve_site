@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useParams, Link } from 'react-router-dom'
-import { Heart, Truck, RefreshCcw, ShieldCheck, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Heart, Truck, RefreshCcw, ShieldCheck, ArrowLeft } from 'lucide-react'
 import { products } from '../data/catalog'
 import { formatInr } from '../lib/utils'
 import { useCommerceStore } from '../store/cart'

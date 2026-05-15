@@ -49,7 +49,7 @@ export function JournalPage() {
                   Read Full Article <ArrowRight size={16} />
                 </Link>
               </div>
-              <div style={{ background: 'var(--surface)', aspect_ratio: '16/9', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--surface)', aspectRatio: '16/9', overflow: 'hidden' }}>
                  <img 
                    src={`https://images.unsplash.com/photo-${1500000000000 + i * 100000}?auto=format&fit=crop&w=800&q=80`} 
                    alt={post.title}

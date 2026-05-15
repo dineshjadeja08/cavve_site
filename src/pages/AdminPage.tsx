@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { 
   LayoutDashboard, 
   Package, 
@@ -24,7 +23,7 @@ type AdminStats = {
 }
 
 export function AdminPage() {
-  const { profile, session, loading } = useAuthState()
+  const { profile, loading } = useAuthState()
   const [stats, setStats] = useState<AdminStats>({
     totalOrders: 0,
     totalRevenue: 0,
@@ -41,8 +40,8 @@ export function AdminPage() {
 
     async function loadAdminData() {
       // Fetch Stats
-      const { data: orders } = await supabase.from('orders').select('status, total_inr')
-      const { count: customerCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
+      const { data: orders } = await supabase!.from('orders').select('status, total_inr')
+      const { count: customerCount } = await supabase!.from('profiles').select('*', { count: 'exact', head: true })
 
       if (orders) {
         const revenue = orders.reduce((sum, o) => sum + (o.status === 'paid' || o.status === 'processing' ? o.total_inr : 0), 0)
@@ -56,7 +55,7 @@ export function AdminPage() {
       }
 
       // Fetch Recent Orders
-      const { data: recent } = await supabase
+      const { data: recent } = await supabase!
         .from('orders')
         .select('id, status, total_inr, created_at, profiles(full_name)')
         .order('created_at', { ascending: false })

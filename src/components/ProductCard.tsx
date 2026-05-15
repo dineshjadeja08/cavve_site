@@ -1,4 +1,4 @@
-import { Heart, Plus, ShoppingBag } from 'lucide-react'
+import { Heart, ShoppingBag } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Product } from '../data/catalog'
 import { formatInr } from '../lib/utils'

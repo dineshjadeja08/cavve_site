@@ -36,7 +36,7 @@ export function AboutPage() {
             <img 
               src="https://images.unsplash.com/photo-1490367532201-b9bc1dc483f6?auto=format&fit=crop&w=800&q=90" 
               alt="Editorial fashion" 
-              style={{ width: '100%', aspect_ratio: '4/5', objectFit: 'cover' }}
+              style={{ width: '100%', aspectRatio: '4/5', objectFit: 'cover' }}
             />
           </motion.div>
         </div>
