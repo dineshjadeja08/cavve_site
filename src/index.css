@@ -1625,6 +1625,222 @@ img { display: block; max-width: 100%; height: auto; }
   display: block;
 }
 
+/* Admin Panel */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  min-height: 100vh;
+  background: #fcfcfc;
+  padding: 0;
+}
+
+.admin-sidebar {
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 40px 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-brand {
+  margin-bottom: 60px;
+}
+
+.admin-brand h2 {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--secondary);
+  transition: all 0.2s var(--transition);
+  text-align: left;
+}
+
+.admin-nav button:hover, .admin-nav button.active {
+  background: var(--surface);
+  color: var(--primary);
+}
+
+.admin-main {
+  padding: 60px 80px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 60px;
+}
+
+.admin-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.role-tag {
+  text-transform: uppercase;
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--primary);
+  color: var(--bg);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--secondary);
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+.admin-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.admin-panel-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 32px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--secondary);
+}
+
+.admin-table td {
+  padding: 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-pill {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 800;
+  padding: 4px 8px;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.status-pill.paid { background: #dcfce7; color: #166534; }
+.status-pill.pending { background: #fef9c3; color: #854d0e; }
+
+.activity-list {
+  display: grid;
+  gap: 24px;
+}
+
+.activity-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.activity-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-icon.green { background: #dcfce7; color: #166534; }
+.activity-icon.blue { background: #dbeafe; color: #1e40af; }
+.activity-icon.orange { background: #ffedd5; color: #9a3412; }
+
+.activity-details p {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.activity-details span {
+  font-size: 11px;
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+@media (max-width: 1280px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-content-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 1024px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-sidebar { display: none; }
+  .admin-main { padding: 40px 20px; }
+}
+
 /* PDP Reviews */
 .reviews-grid {
   display: grid;

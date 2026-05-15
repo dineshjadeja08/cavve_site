@@ -20,6 +20,7 @@ import { WishlistPage } from './pages/WishlistPage'
 import { AccountPage } from './pages/AccountPage'
 import { AboutPage } from './pages/AboutPage'
 import { JournalPage } from './pages/JournalPage'
+import { AdminPage } from './pages/AdminPage'
 
 function Layout() {
   const { pathname } = useLocation()
@@ -66,6 +67,7 @@ function App() {
             <Route path="about" element={<AboutPage />} />
             <Route path="journal" element={<JournalPage />} />
             <Route path="drop" element={<CollectionsPage />} />
+            <Route path="admin" element={<AdminPage />} />
             {/* Catch all */}
             <Route path="*" element={<HomePage />} />
           </Route>
