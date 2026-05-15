@@ -1,15 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter } from 'lucide-react'
-import { products } from '../data/catalog'
+import type { Product } from '../data/catalog'
+import { fetchDbProducts } from '../lib/products'
 import { ProductCard } from '../components/ProductCard'
 import { SEO } from '../components/SEO'
 
 export function CollectionsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [dbProducts, setDbProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredProducts = products.filter(product => {
+  useEffect(() => {
+    async function loadProducts() {
+      const prods = await fetchDbProducts()
+      setDbProducts(prods)
+      setLoading(false)
+    }
+    loadProducts()
+  }, [])
+
+  const filteredProducts = dbProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.copy.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === 'All' || product.fit.includes(selectedCategory)
@@ -67,20 +79,24 @@ export function CollectionsPage() {
           </div>
         </div>
 
-        <div className="product-grid">
-          {filteredProducts.map((product, i) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '100px 0' }}>Syncing collection protocol...</div>
+        ) : (
+          <div className="product-grid">
+            {filteredProducts.map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
 
-        {filteredProducts.length === 0 && (
+        {!loading && filteredProducts.length === 0 && (
           <div style={{ textAlign: 'center', padding: '100px 0' }}>
             <p className="eyebrow">Zero results</p>
             <h2 style={{ marginBottom: '24px' }}>No matches found in this drop.</h2>

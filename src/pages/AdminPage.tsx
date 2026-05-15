@@ -10,7 +10,9 @@ import {
   Plus,
   Trash2,
   Layers,
-  CheckCircle2
+  CheckCircle2,
+  Edit2,
+  Image as ImageIcon
 } from 'lucide-react'
 import { useAuthState } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -33,6 +35,21 @@ type Collection = {
   created_at: string
 }
 
+type DbProduct = {
+  id: string
+  collection_id: string | null
+  slug: string
+  name: string
+  description: string
+  price_inr: number
+  compare_at_inr: number | null
+  fit: string
+  gsm: string
+  status: string
+  images: string[]
+  created_at: string
+}
+
 export function AdminPage() {
   const { profile, loading } = useAuthState()
   const [stats, setStats] = useState<AdminStats>({
@@ -49,6 +66,21 @@ export function AdminPage() {
   const [isAddingCollection, setIsAddingCollection] = useState(false)
   const [newCollection, setNewCollection] = useState({ title: '', slug: '', description: '' })
 
+  // Products State
+  const [products, setProducts] = useState<DbProduct[]>([])
+  const [isAddingProduct, setIsAddingProduct] = useState(false)
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    slug: '',
+    description: '',
+    price_inr: 2490,
+    compare_at_inr: 2990,
+    fit: 'Oversized',
+    gsm: '240 GSM',
+    collection_id: '',
+    images: ['']
+  })
+
   const isStaff = profile?.role === 'admin' || profile?.role === 'staff'
 
   useEffect(() => {
@@ -56,14 +88,14 @@ export function AdminPage() {
 
     async function loadAdminData() {
       // Fetch Stats
-      const { data: orders } = await supabase!.from('orders').select('status, total_inr')
+      const { data: ordersData } = await supabase!.from('orders').select('status, total_inr')
       const { count: customerCount } = await supabase!.from('profiles').select('*', { count: 'exact', head: true })
 
-      if (orders) {
-        const revenue = orders.reduce((sum, o) => sum + (o.status === 'paid' || o.status === 'processing' ? o.total_inr : 0), 0)
-        const pending = orders.filter(o => o.status === 'pending').length
+      if (ordersData) {
+        const revenue = ordersData.reduce((sum, o) => sum + (o.status === 'paid' || o.status === 'processing' ? o.total_inr : 0), 0)
+        const pending = ordersData.filter(o => o.status === 'pending').length
         setStats({
-          totalOrders: orders.length,
+          totalOrders: ordersData.length,
           totalRevenue: revenue,
           totalCustomers: customerCount || 0,
           pendingOrders: pending
@@ -82,6 +114,10 @@ export function AdminPage() {
       // Fetch Collections
       const { data: cols } = await supabase!.from('collections').select('*').order('created_at', { ascending: false })
       setCollections(cols || [])
+
+      // Fetch Products
+      const { data: prods } = await supabase!.from('products').select('*').order('created_at', { ascending: false })
+      setProducts(prods || [])
     }
 
     loadAdminData()
@@ -122,6 +158,57 @@ export function AdminPage() {
     setCollections(collections.filter(c => c.id !== id))
   }
 
+  async function handleAddProduct() {
+    if (!supabase || !newProduct.name || !newProduct.slug) return
+
+    const productToInsert = {
+      ...newProduct,
+      collection_id: newProduct.collection_id || null,
+      status: 'active'
+    }
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert([productToInsert])
+      .select()
+      .single()
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    setProducts([data, ...products])
+    setIsAddingProduct(false)
+    setNewProduct({
+      name: '',
+      slug: '',
+      description: '',
+      price_inr: 2490,
+      compare_at_inr: 2990,
+      fit: 'Oversized',
+      gsm: '240 GSM',
+      collection_id: '',
+      images: ['']
+    })
+  }
+
+  async function handleDeleteProduct(id: string) {
+    if (!supabase || !confirm('Are you sure you want to delete this product?')) return
+
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    setProducts(products.filter(p => p.id !== id))
+  }
+
   if (loading) return <div className="section-padding page-header-offset" style={{ textAlign: 'center' }}>Verifying credentials...</div>
 
   if (!isStaff) {
@@ -151,11 +238,11 @@ export function AdminPage() {
           <button className={activeTab === 'collections' ? 'active' : ''} onClick={() => setActiveTab('collections')}>
             <Layers size={18} /> Collections
           </button>
-          <button className={activeTab === 'orders' ? 'active' : ''} onClick={() => setActiveTab('orders')}>
-            <Clock size={18} /> Orders
-          </button>
           <button className={activeTab === 'products' ? 'active' : ''} onClick={() => setActiveTab('products')}>
             <Package size={18} /> Catalog
+          </button>
+          <button className={activeTab === 'orders' ? 'active' : ''} onClick={() => setActiveTab('orders')}>
+            <Clock size={18} /> Orders
           </button>
           <button className={activeTab === 'customers' ? 'active' : ''} onClick={() => setActiveTab('customers')}>
             <Users size={18} /> Customers
@@ -242,8 +329,8 @@ export function AdminPage() {
                   <button onClick={() => { setActiveTab('collections'); setIsAddingCollection(true); }}>
                     <Layers size={14} /> New Collection
                   </button>
-                  <button onClick={() => setActiveTab('products')}>
-                    <Package size={14} /> Update Inventory
+                  <button onClick={() => { setActiveTab('products'); setIsAddingProduct(true); }}>
+                    <Package size={14} /> New Product
                   </button>
                   <button onClick={() => setActiveTab('orders')}>
                     <Clock size={14} /> Process Pending
@@ -346,6 +433,164 @@ export function AdminPage() {
           </motion.div>
         )}
 
+        {activeTab === 'products' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <header className="admin-header">
+              <div>
+                <h1>Inventory Protocol</h1>
+                <p>Manage the clinical product catalog.</p>
+              </div>
+              <button className="primary-button" onClick={() => setIsAddingProduct(true)}>
+                <Plus size={16} /> New Product
+              </button>
+            </header>
+
+            {isAddingProduct && (
+              <div className="admin-panel-card" style={{ marginBottom: '40px' }}>
+                <div className="panel-header">
+                  <h3>Catalog New Item</h3>
+                </div>
+                <div className="admin-form">
+                  <div className="form-grid">
+                    <div className="field">
+                      <label>Product Name</label>
+                      <input 
+                        placeholder="e.g. Jet Black Oversized Tee" 
+                        value={newProduct.name}
+                        onChange={e => setNewProduct({ ...newProduct, name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label>Slug</label>
+                      <input 
+                        placeholder="jet-black-tee" 
+                        value={newProduct.slug}
+                        onChange={e => setNewProduct({ ...newProduct, slug: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-grid">
+                    <div className="field">
+                      <label>Price (INR)</label>
+                      <input 
+                        type="number"
+                        value={newProduct.price_inr}
+                        onChange={e => setNewProduct({ ...newProduct, price_inr: parseInt(e.target.value) })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label>Compare At (INR)</label>
+                      <input 
+                        type="number"
+                        value={newProduct.compare_at_inr || ''}
+                        onChange={e => setNewProduct({ ...newProduct, compare_at_inr: parseInt(e.target.value) })}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-grid">
+                    <div className="field">
+                      <label>Fit</label>
+                      <input 
+                        placeholder="Oversized"
+                        value={newProduct.fit}
+                        onChange={e => setNewProduct({ ...newProduct, fit: e.target.value })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label>GSM</label>
+                      <input 
+                        placeholder="240 GSM"
+                        value={newProduct.gsm}
+                        onChange={e => setNewProduct({ ...newProduct, gsm: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label>Collection</label>
+                    <select 
+                      value={newProduct.collection_id}
+                      onChange={e => setNewProduct({ ...newProduct, collection_id: e.target.value })}
+                      style={{ width: '100%', padding: '12px', border: '1px solid var(--border)', background: 'white' }}
+                    >
+                      <option value="">No Collection</option>
+                      {collections.map(col => (
+                        <option key={col.id} value={col.id}>{col.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>Description</label>
+                    <textarea 
+                      placeholder="Product philosophy and details..." 
+                      rows={3}
+                      value={newProduct.description}
+                      onChange={e => setNewProduct({ ...newProduct, description: e.target.value })}
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Image URLs (Comma separated)</label>
+                    <input 
+                      placeholder="https://image1.jpg, https://image2.jpg"
+                      value={newProduct.images.join(', ')}
+                      onChange={e => setNewProduct({ ...newProduct, images: e.target.value.split(',').map(s => s.trim()) })}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+                    <button className="primary-button" onClick={handleAddProduct}>Add to Catalog</button>
+                    <button className="secondary-button" onClick={() => setIsAddingProduct(false)}>Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="admin-panel-card">
+              <div className="admin-table-wrapper">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Fit/GSM</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.map(prod => (
+                      <tr key={prod.id}>
+                        <td>
+                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <div style={{ width: '40px', height: '40px', background: 'var(--surface)', borderRadius: '4px', overflow: 'hidden' }}>
+                              {prod.images?.[0] ? <img src={prod.images[0]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={20} style={{ margin: '10px', opacity: 0.2 }} />}
+                            </div>
+                            <div>
+                              <div className="weight-700">{prod.name}</div>
+                              <div className="mono" style={{ fontSize: '10px', opacity: 0.5 }}>{prod.slug}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="weight-700">{formatInr(prod.price_inr)}</td>
+                        <td>{prod.fit} / {prod.gsm}</td>
+                        <td>
+                          <span className="status-pill paid" style={{ background: '#dcfce7', color: '#166534' }}>
+                            {prod.status}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button className="icon-btn" style={{ color: 'var(--primary)' }}><Edit2 size={14} /></button>
+                            <button className="icon-btn danger" onClick={() => handleDeleteProduct(prod.id)}><Trash2 size={14} /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {activeTab === 'orders' && (
            <div style={{ textAlign: 'center', padding: '100px 0' }}>
              <Clock size={48} style={{ opacity: 0.1, marginBottom: '24px' }} />
@@ -354,11 +599,11 @@ export function AdminPage() {
            </div>
         )}
         
-        {activeTab === 'products' && (
+        {activeTab === 'customers' && (
            <div style={{ textAlign: 'center', padding: '100px 0' }}>
-             <Package size={48} style={{ opacity: 0.1, marginBottom: '24px' }} />
-             <h2>Inventory Protocol</h2>
-             <p style={{ color: 'var(--secondary)' }}>Product management module coming in the next protocol update.</p>
+             <Users size={48} style={{ opacity: 0.1, marginBottom: '24px' }} />
+             <h2>Community Protocol</h2>
+             <p style={{ color: 'var(--secondary)' }}>Customer management module coming in the next protocol update.</p>
            </div>
         )}
       </main>

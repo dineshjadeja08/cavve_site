@@ -1,20 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useParams, Link } from 'react-router-dom'
 import { Heart, Truck, RefreshCcw, ShieldCheck, ArrowLeft, ShoppingBag, Ruler } from 'lucide-react'
-import { products } from '../data/catalog'
+import type { Product } from '../data/catalog'
+import { fetchDbProductBySlug } from '../lib/products'
 import { formatInr } from '../lib/utils'
 import { useCommerceStore } from '../store/cart'
 import { SEO } from '../components/SEO'
 
 export function ProductPage() {
   const { slug } = useParams()
-  const product = products.find(p => p.slug === slug)
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
   const [selectedSize, setSelectedSize] = useState('')
   const [activeImage, setActiveImage] = useState(0)
   const { addToCart, wishlist, toggleWishlist, openCart } = useCommerceStore()
 
-  if (!product) return <div className="section-padding page-header-offset">Product not found.</div>
+  useEffect(() => {
+    async function loadProduct() {
+      if (!slug) return
+      const p = await fetchDbProductBySlug(slug)
+      setProduct(p)
+      setLoading(false)
+    }
+    loadProduct()
+  }, [slug])
+
+  if (loading) return <div className="section-padding page-header-offset" style={{ textAlign: 'center' }}>Syncing product protocol...</div>
+  if (!product) return <div className="section-padding page-header-offset">Product not found in current drop.</div>
 
   const isWishlisted = wishlist.includes(product.id)
 
