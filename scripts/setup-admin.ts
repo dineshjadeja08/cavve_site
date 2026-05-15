@@ -35,26 +35,24 @@ async function createAdmin() {
   })
 
   if (authError) {
-    if (authError.message.includes('already registered')) {
-      console.log('User already exists in auth.users. Proceeding to role update...')
-      // Try to find the user by email
+    if (authError.message.toLowerCase().includes('already registered') || authError.message.toLowerCase().includes('already been registered')) {
+      console.log('User already exists. Updating role to Admin...')
       const { data: listData } = await supabase.auth.admin.listUsers()
       const existingUser = listData?.users.find(u => u.email === email)
+      
       if (!existingUser) {
-        console.error('Could not find existing user.')
+        console.error('Could not find existing user in the list.')
         return
       }
       
-      // Update role
       const { error: roleError } = await supabase
         .from('profiles')
-        .update({ role: 'admin' })
-        .eq('id', existingUser.id)
+        .upsert({ id: existingUser.id, role: 'admin', full_name: 'CAVVE Admin' })
 
       if (roleError) console.error('Error updating role:', roleError.message)
-      else console.log('Successfully elevated existing user to Admin.')
+      else console.log('Successfully updated existing user to Admin.')
     } else {
-      console.error('Error creating user:', authError.message)
+      console.error('Error:', authError.message)
     }
     return
   }
